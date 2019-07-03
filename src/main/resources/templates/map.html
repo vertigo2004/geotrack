@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>OpenLayers Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" th:href="@{css/base.css}" />
+    <script th:src="@{OpenLayers-2.13.1/OpenLayers.js}"></script>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+
+        var rawLonLat = [[${lonLat}]];
+        var track = JSON.parse(rawLonLat);
+
+        function init() {
+            var lat            = 48.91962;
+            var lon            = 24.71187;
+            var zoom           = 17;
+
+            map = new OpenLayers.Map("basicMap");
+            var mapnik         = new OpenLayers.Layer.OSM();
+            var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+            var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+            // var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+
+            map.addLayer(mapnik);
+
+            var markers = new OpenLayers.Layer.Markers( "Markers" );
+            map.addLayer(markers);
+            // markers.addMarker(new OpenLayers.Marker(position));
+
+
+
+            for (var i = 0; i < track.length; i+=10) {
+                position = new OpenLayers.LonLat(track[i].lon, track[i].lat).transform( fromProjection, toProjection);
+                markers.addMarker(new OpenLayers.Marker(position));
+            }
+            map.setCenter(position, zoom);
+        }
+        /*]]>*/
+    </script>
+</head>
+<body onload="init();">
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+<!--<input type="hidden" id="matchingLevels" value="${matchForm.matchingLevels}"/>-->
+<div id="basicMap"></div>
+</body>
+</html>

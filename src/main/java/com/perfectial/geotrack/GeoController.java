@@ -45,16 +45,17 @@ public class GeoController {
         final GpxContentHandler gch = new GpxContentHandler();
 
         gpxParser.parseGpx(file, gch);
-        if (gch.getSegments().size() > 0) {
-            List<TrackPoint> track = gch.getSegments().get(0);
-            int trackSize = track.size();
+        List<List<TrackPoint>> segments = gch.getSegments();
 
-            log.info("Track points red: {}", trackSize);
+        if (segments.size() > 0) {
+
+            log.info("Segments in total: {}", segments.size());
+            log.info("TrackPoints in the first segment: {}", segments.get(0).size());
             ObjectMapper objectMapper = new ObjectMapper();
 
             try {
-                String json = objectMapper.writeValueAsString(track);
-                redirectAttributes.addFlashAttribute("lonLat", json);
+                String json = objectMapper.writeValueAsString(segments);
+                redirectAttributes.addFlashAttribute("segments", json);
             } catch (JsonProcessingException e) {
                 throw new GpxException("Error parsing GPX to JSON");
             }

@@ -2,22 +2,38 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>OpenLayers Demo</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" th:href="@{css/base.css}" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{css/base.css}"/>
     <script th:src="@{OpenLayers-2.13.1/OpenLayers.js}"></script>
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
 
-        var rawLonLat = [[${lonLat}]];
-        var track = JSON.parse(rawLonLat);
+        var segments = JSON.parse([[${segments}]]);
         var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
-        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+        var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+
+        function getNewMinMax(mm, trackPoint) {
+            if (trackPoint.lat < mm.minLat) {
+                mm.minLat = trackPoint.lat;
+            }
+            if (trackPoint.lat > mm.maxLat) {
+                mm.maxLat = trackPoint.lat;
+            }
+
+            if (trackPoint.lon < mm.minLon) {
+                mm.minLon = trackPoint.lon;
+            }
+            if (trackPoint.lon > mm.maxLon) {
+                mm.maxLon = trackPoint.lon;
+            }
+            return mm;
+        }
 
         function init() {
             var lat = 48.91962;
             var lon = 24.71187;
             var zoom = 15;
-            var trackIndexStep = 10
+            var trackIndexStep = 10;
 
             var map = new OpenLayers.Map("basicMap");
             var mapnik = new OpenLayers.Layer.OSM(); // OpenStreetMap
@@ -26,37 +42,50 @@
             // new vector graphic layer
             var vector = new OpenLayers.Layer.Vector();
 
-            // Start and end point
-            var start_point = new OpenLayers.Geometry.Point(track[0].lon, track[0].lat)
-                .transform( fromProjection, toProjection);
-            var end_point;
-
             var style = {
                 strokeColor: "#FF0000",
                 strokeWidth: 5,
             };
 
-            for (var i = trackIndexStep; i < track.length; i += trackIndexStep) {
-                end_point = new OpenLayers.Geometry.Point(track[i].lon, track[i].lat)
-                    .transform( fromProjection, toProjection);
-                // Make line
-                var geo = new OpenLayers.Geometry.LineString([start_point, end_point]);
-                var line = new OpenLayers.Feature.Vector(geo, null, style);
-                // Add new feature to layer named by vector
-                vector.addFeatures([line]);
-                start_point = end_point;
-            }
+            var minMax = {
+                maxLat : segments[0][0].lat,
+                minLat : segments[0][0].lat,
+                maxLon : segments[0][0].lon,
+                minLon : segments[0][0].lon
+            };
 
+            console.log(minMax);
+
+            segments.forEach(function (track) {
+
+                // Start and end point
+                var start_point = new OpenLayers.Geometry.Point(track[0].lon, track[0].lat)
+                    .transform(fromProjection, toProjection);
+                var end_point;
+
+                for (var i = trackIndexStep; i < track.length; i += trackIndexStep) {
+                    minMax = getNewMinMax(minMax, track[i]);
+                    end_point = new OpenLayers.Geometry.Point(track[i].lon, track[i].lat)
+                        .transform(fromProjection, toProjection);
+                    // Make line
+                    var geo = new OpenLayers.Geometry.LineString([start_point, end_point]);
+                    var line = new OpenLayers.Feature.Vector(geo, null, style);
+                    // Add new feature to layer named by vector
+                    vector.addFeatures([line]);
+                    start_point = end_point;
+                }
+            });
             // Add vector layer to map
             map.addLayers([vector]);
 
-
+            console.log(minMax);
             var center = new OpenLayers.LonLat(
-                track[Math.round(track.length / 2)].lon,
-                track[Math.round(track.length / 2)].lat)
-                    .transform( fromProjection, toProjection);
-            map.setCenter(center, zoom );
+                (minMax.maxLon + minMax.minLon) / 2,
+                (minMax.maxLat + minMax.minLat) / 2)
+                .transform(fromProjection, toProjection);
+            map.setCenter(center, zoom);
         }
+
         /*]]>*/
     </script>
 </head>
@@ -65,18 +94,18 @@
     <h2 th:text="${message}"/>
 </div>
 <div id="loadForm">
-<form method="POST" enctype="multipart/form-data" action="/">
-    <table>
-        <tr>
-            <td>File to upload:</td>
-            <td><input type="file" name="file" /></td>
-            <td><input type="submit" value="Upload" />
-            </td>
-        </tr>
-    </table>
-</form>
+    <form method="POST" enctype="multipart/form-data" action="/">
+        <table>
+            <tr>
+                <td>File to upload:</td>
+                <td><input type="file" name="file"/></td>
+                <td><input type="submit" value="Upload"/>
+                </td>
+            </tr>
+        </table>
+    </form>
 </div>
-<div id="basicMap" th:if="${lonLat}">
+<div id="basicMap" th:if="${segments}">
     <script type="text/javascript" th:inline="javascript">
         init();
     </script>

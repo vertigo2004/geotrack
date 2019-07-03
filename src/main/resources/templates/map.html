@@ -10,40 +10,76 @@
 
         var rawLonLat = [[${lonLat}]];
         var track = JSON.parse(rawLonLat);
+        var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
 
         function init() {
-            var lat            = 48.91962;
-            var lon            = 24.71187;
-            var zoom           = 17;
+            var lat = 48.91962;
+            var lon = 24.71187;
+            var zoom = 15;
+            var trackIndexStep = 10
 
-            map = new OpenLayers.Map("basicMap");
-            var mapnik         = new OpenLayers.Layer.OSM();
-            var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
-            var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-            // var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
-
+            var map = new OpenLayers.Map("basicMap");
+            var mapnik = new OpenLayers.Layer.OSM(); // OpenStreetMap
             map.addLayer(mapnik);
 
-            var markers = new OpenLayers.Layer.Markers( "Markers" );
-            map.addLayer(markers);
-            // markers.addMarker(new OpenLayers.Marker(position));
+            // new vector graphic layer
+            var vector = new OpenLayers.Layer.Vector();
 
+            // Start and end point
+            var start_point = new OpenLayers.Geometry.Point(track[0].lon, track[0].lat)
+                .transform( fromProjection, toProjection);
+            var end_point;
 
+            var style = {
+                strokeColor: "#FF0000",
+                strokeWidth: 5,
+            };
 
-            for (var i = 0; i < track.length; i+=10) {
-                position = new OpenLayers.LonLat(track[i].lon, track[i].lat).transform( fromProjection, toProjection);
-                markers.addMarker(new OpenLayers.Marker(position));
+            for (var i = trackIndexStep; i < track.length; i += trackIndexStep) {
+                end_point = new OpenLayers.Geometry.Point(track[i].lon, track[i].lat)
+                    .transform( fromProjection, toProjection);
+                // Make line
+                var geo = new OpenLayers.Geometry.LineString([start_point, end_point]);
+                var line = new OpenLayers.Feature.Vector(geo, null, style);
+                // Add new feature to layer named by vector
+                vector.addFeatures([line]);
+                start_point = end_point;
             }
-            map.setCenter(position, zoom);
+
+            // Add vector layer to map
+            map.addLayers([vector]);
+
+
+            var center = new OpenLayers.LonLat(
+                track[Math.round(track.length / 2)].lon,
+                track[Math.round(track.length / 2)].lat)
+                    .transform( fromProjection, toProjection);
+            map.setCenter(center, zoom );
         }
         /*]]>*/
     </script>
 </head>
-<body onload="init();">
+<body>
 <div th:if="${message}">
     <h2 th:text="${message}"/>
 </div>
-<!--<input type="hidden" id="matchingLevels" value="${matchForm.matchingLevels}"/>-->
-<div id="basicMap"></div>
+<div id="loadForm">
+<form method="POST" enctype="multipart/form-data" action="/">
+    <table>
+        <tr>
+            <td>File to upload:</td>
+            <td><input type="file" name="file" /></td>
+            <td><input type="submit" value="Upload" />
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+<div id="basicMap" th:if="${lonLat}">
+    <script type="text/javascript" th:inline="javascript">
+        init();
+    </script>
+</div>
 </body>
 </html>

@@ -40,16 +40,15 @@ var gpxSegments = gpxFormat.readFeatures(segments, {
 });
 
 var vectorSource = new ol.source.Vector({
-    // url: 'gpx/RK_gpx _2018-08-08_0930.gpx'
     format: gpxFormat,
     features: gpxSegments,
-    style: function (feature) {
-        return style[feature.getGeometry().getType()];
-    }
 });
 
 var vector = new ol.layer.Vector({
-    source: vectorSource
+    source: vectorSource,
+    style: function (feature) {
+        return style[feature.getGeometry().getType()];
+    }
 });
 
 var map = new ol.Map({

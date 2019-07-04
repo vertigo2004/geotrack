@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 @Controller
@@ -33,34 +34,33 @@ public class GeoController {
     }
 
     @PostMapping("/")
-    public String processGPX(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String processGPX(@RequestParam("file") MultipartFile file,
+                             RedirectAttributes redirectAttributes
+    ) throws IOException {
 
-        log.info("ContentType: {}", file.getContentType());
-
-        log.info("Name: {}", file.getName());
-        log.info("OriginalFilename: {}", file.getOriginalFilename());
         redirectAttributes.addFlashAttribute("message",
                 "You successfully uploaded " + file.getOriginalFilename() + "!");
+
+        getGpxStats(file);
+        String gpxContent = new String(file.getBytes());
+        redirectAttributes.addFlashAttribute("segments", gpxContent);
+
+        return "redirect:/";
+    }
+
+    private void getGpxStats( MultipartFile file) {
+        log.info("ContentType: {}", file.getContentType());
+        log.info("Name: {}", file.getName());
+        log.info("OriginalFilename: {}", file.getOriginalFilename());
 
         final GpxContentHandler gch = new GpxContentHandler();
 
         gpxParser.parseGpx(file, gch);
         List<List<TrackPoint>> segments = gch.getSegments();
-
         if (segments.size() > 0) {
 
             log.info("Segments in total: {}", segments.size());
             log.info("TrackPoints in the first segment: {}", segments.get(0).size());
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            try {
-                String json = objectMapper.writeValueAsString(segments);
-                redirectAttributes.addFlashAttribute("segments", json);
-            } catch (JsonProcessingException e) {
-                throw new GpxException("Error parsing GPX to JSON");
-            }
         }
-
-        return "redirect:/";
     }
 }

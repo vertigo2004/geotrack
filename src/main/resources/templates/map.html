@@ -4,89 +4,12 @@
     <title>OpenLayers Demo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" th:href="@{css/base.css}"/>
-    <script th:src="@{OpenLayers-2.13.1/OpenLayers.js}"></script>
+
+    <script th:src="@{v5.3.0-dist/ol.js}" th:inline="javascript" ></script>
+    <link rel="stylesheet" th:href="@{v5.3.0-dist/ol.css}"/>
+
     <script type="text/javascript" th:inline="javascript">
-        /*<![CDATA[*/
-
-        var segments = JSON.parse([[${segments}]]);
-        var fromProjection = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
-        var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-
-        function getNewMinMax(mm, trackPoint) {
-            if (trackPoint.lat < mm.minLat) {
-                mm.minLat = trackPoint.lat;
-            }
-            if (trackPoint.lat > mm.maxLat) {
-                mm.maxLat = trackPoint.lat;
-            }
-
-            if (trackPoint.lon < mm.minLon) {
-                mm.minLon = trackPoint.lon;
-            }
-            if (trackPoint.lon > mm.maxLon) {
-                mm.maxLon = trackPoint.lon;
-            }
-            return mm;
-        }
-
-        function init() {
-            var lat = 48.91962;
-            var lon = 24.71187;
-            var zoom = 15;
-            var trackIndexStep = 10;
-
-            var map = new OpenLayers.Map("basicMap");
-            var mapnik = new OpenLayers.Layer.OSM(); // OpenStreetMap
-            map.addLayer(mapnik);
-
-            // new vector graphic layer
-            var vector = new OpenLayers.Layer.Vector();
-
-            var style = {
-                strokeColor: "#FF0000",
-                strokeWidth: 5,
-            };
-
-            var minMax = {
-                maxLat : segments[0][0].lat,
-                minLat : segments[0][0].lat,
-                maxLon : segments[0][0].lon,
-                minLon : segments[0][0].lon
-            };
-
-            console.log(minMax);
-
-            segments.forEach(function (track) {
-
-                // Start and end point
-                var start_point = new OpenLayers.Geometry.Point(track[0].lon, track[0].lat)
-                    .transform(fromProjection, toProjection);
-                var end_point;
-
-                for (var i = trackIndexStep; i < track.length; i += trackIndexStep) {
-                    minMax = getNewMinMax(minMax, track[i]);
-                    end_point = new OpenLayers.Geometry.Point(track[i].lon, track[i].lat)
-                        .transform(fromProjection, toProjection);
-                    // Make line
-                    var geo = new OpenLayers.Geometry.LineString([start_point, end_point]);
-                    var line = new OpenLayers.Feature.Vector(geo, null, style);
-                    // Add new feature to layer named by vector
-                    vector.addFeatures([line]);
-                    start_point = end_point;
-                }
-            });
-            // Add vector layer to map
-            map.addLayers([vector]);
-
-            console.log(minMax);
-            var center = new OpenLayers.LonLat(
-                (minMax.maxLon + minMax.minLon) / 2,
-                (minMax.maxLat + minMax.minLat) / 2)
-                .transform(fromProjection, toProjection);
-            map.setCenter(center, zoom);
-        }
-
-        /*]]>*/
+        var segments = [[${segments}]];
     </script>
 </head>
 <body>
@@ -106,8 +29,7 @@
     </form>
 </div>
 <div id="basicMap" th:if="${segments}">
-    <script type="text/javascript" th:inline="javascript">
-        init();
+    <script type="module" th:src="@{js/index.js}" th:inline="javascript">
     </script>
 </div>
 </body>

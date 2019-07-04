@@ -1,4 +1,4 @@
-package com.perfectial.geotrack;
+package com.perfectial.geotrack.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

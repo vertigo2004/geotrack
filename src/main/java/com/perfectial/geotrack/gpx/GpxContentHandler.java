@@ -27,7 +27,8 @@ public final class GpxContentHandler extends DefaultHandler {
     private double ele;
 
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes
+    ) throws SAXException {
         if (ELEM_TRKSEG.equals(qName)) {
             trackSegment = new ArrayList<>();
         } else if (ELEM_TRKPT.equals(qName)) {

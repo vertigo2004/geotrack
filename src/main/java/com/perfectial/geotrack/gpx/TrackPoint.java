@@ -1,12 +1,45 @@
 package com.perfectial.geotrack.gpx;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TrackPoint {
 
-        private final double lat;
-        private final double lon;
-        private final long time;
-        private final double elevation;
+    private Double lat;
+    private Double lon;
+    private Long time;
+    private Double elevation;
+
+    public String getXML() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<trkpt");
+        if (lat != null) {
+            sb.append(" lat =\"").append(lat).append("\"");
+        }
+        if (lon != null) {
+            sb.append(" lon =\"").append(lon).append("\"");
+        }
+        sb.append(">");
+
+        if (time != null) {
+            sb.append("<time>").append(time).append("</time>");
+        }
+        if (elevation!= null) {
+            sb.append("<ele>").append(elevation).append("</ele>");
+        }
+
+        getExtensions(sb);
+
+        sb.append("</trkpt>");
+
+        return sb.toString();
+    }
+
+    protected void getExtensions(StringBuilder sb) {
+    }
 }

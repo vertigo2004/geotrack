@@ -1,9 +1,6 @@
 package com.perfectial.geotrack.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.perfectial.geotrack.gpx.GpxContentHandler;
-import com.perfectial.geotrack.gpx.GpxException;
 import com.perfectial.geotrack.gpx.GpxParser;
 import com.perfectial.geotrack.gpx.TrackPoint;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 @Controller

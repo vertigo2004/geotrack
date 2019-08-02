@@ -9,11 +9,11 @@ var style = {
     'Point': new ol.style.Style({
         image: new ol.style.Circle({
             fill: new ol.style.Fill({
-                color: 'rgba(255,255,0,0.4)'
+                color: 'rgba(0,0,255,0.5)'
             }),
             radius: 5,
             stroke: new ol.style.Stroke({
-                color: '#ff0',
+                color: '#00f',
                 width: 1
             })
         })
@@ -56,9 +56,13 @@ var map = new ol.Map({
     layers: [raster, vector],
     view: new ol.View({
         center: ol.proj.fromLonLat([lon, lat]),
-        zoom: 15
+        zoom: 16
     })
 });
 
 var extent = vector.getSource().getExtent();
+
 map.getView().fit(extent, map.getSize());
+if (map.getView().getZoom() > 19) {
+    map.getView().setZoom(19);
+}

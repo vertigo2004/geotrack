@@ -2,7 +2,7 @@ package com.perfectial.geotrack.broker;
 
 import com.perfectial.geotrack.gpx.TrackSIM7000;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.status.StatusData;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -13,7 +13,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 public class Subscriber implements MqttCallback {
@@ -28,6 +27,7 @@ public class Subscriber implements MqttCallback {
     private final String password;
     private final String topic;
     private final Queue<TrackSIM7000> trackPoints;
+    private TrackSIM7000 lastPoint;
 
     private MqttClient client;
 
@@ -63,16 +63,11 @@ public class Subscriber implements MqttCallback {
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
         String payload = new String(mqttMessage.getPayload());
         log.info("Topic: {}. Message: {}", this.topic, payload);
+        this.lastPoint = TrackSIM7000.fromCsv(payload);
+        trackPoints.add(this.lastPoint);
 
-        trackPoints.add(TrackSIM7000.fromCsv(payload));
-
-        log.info("Track points in the queue: {}", trackPoints.size());
-        log.info(getTrack());
-    }
-
-    private TrackSIM7000 parseData(String payload) {
-
-        return null;
+        log.debug("Track points in the queue: {}", trackPoints.size());
+        log.debug(getTrack());
     }
 
     @Override
@@ -104,7 +99,12 @@ public class Subscriber implements MqttCallback {
         for (TrackSIM7000 trackPoint : trackPoints) {
             sb.append(trackPoint.getXML());
         }
-        sb.append("</trkseg></trk></gpx>");
+        sb.append("</trkseg></trk>");
+
+        if (this.lastPoint != null) {
+            sb.append(lastPoint.getXML().replace("trkpt", "wpt"));
+        }
+        sb.append("</gpx>");
         return sb.toString();
     }
 }

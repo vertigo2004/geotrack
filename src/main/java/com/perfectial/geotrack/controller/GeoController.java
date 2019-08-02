@@ -1,5 +1,6 @@
 package com.perfectial.geotrack.controller;
 
+import com.perfectial.geotrack.broker.Subscriber;
 import com.perfectial.geotrack.gpx.GpxContentHandler;
 import com.perfectial.geotrack.gpx.GpxParser;
 import com.perfectial.geotrack.gpx.TrackPoint;
@@ -22,6 +23,9 @@ public class GeoController {
 
     @Autowired
     GpxParser gpxParser;
+
+    @Autowired
+    Subscriber subscriber;
 
     @GetMapping("/")
     public String showMap(Model model)  throws IOException {
@@ -58,5 +62,15 @@ public class GeoController {
             log.info("Segments in total: {}", segments.size());
             log.info("TrackPoints in the first segment: {}", segments.get(0).size());
         }
+    }
+
+    @GetMapping("/online")
+    public String online(Model model) throws IOException {
+
+        model.addAttribute("message","Following the Thing on-line");
+
+        model.addAttribute("segments", subscriber.getTrack());
+
+        return "map";
     }
 }

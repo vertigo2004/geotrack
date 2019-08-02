@@ -64,7 +64,7 @@ public class GeoController {
         }
     }
 
-    @GetMapping("/online")
+    @GetMapping("online")
     public String online(Model model) throws IOException {
 
         model.addAttribute("message","Following the Thing on-line");

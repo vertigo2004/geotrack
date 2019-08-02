@@ -7,11 +7,13 @@ var raster = new ol.layer.Tile({
 
 var style = {
     'Point': new ol.style.Style({
-        image: new ol.style.Circle({
+        image: new ol.style.RegularShape({
             fill: new ol.style.Fill({
-                color: 'rgba(0,0,255,0.5)'
+                color: '#00f'
             }),
-            radius: 5,
+            points: 5,
+            radius1: 8,
+            radius2: 4,
             stroke: new ol.style.Stroke({
                 color: '#00f',
                 width: 1

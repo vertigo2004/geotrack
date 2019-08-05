@@ -2,6 +2,7 @@ package com.perfectial.geotrack.controller;
 
 import com.perfectial.geotrack.broker.Subscriber;
 import com.perfectial.geotrack.gpx.GpxContentHandler;
+import com.perfectial.geotrack.gpx.GpxException;
 import com.perfectial.geotrack.gpx.GpxParser;
 import com.perfectial.geotrack.gpx.TrackPoint;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Controller
@@ -48,19 +50,22 @@ public class GeoController {
         return "redirect:/";
     }
 
-    private void getGpxStats( MultipartFile file) {
+    private void getGpxStats(MultipartFile file) {
         log.info("ContentType: {}", file.getContentType());
         log.info("Name: {}", file.getName());
         log.info("OriginalFilename: {}", file.getOriginalFilename());
 
         final GpxContentHandler gch = new GpxContentHandler();
+        try (InputStream inputGpx = file.getInputStream()) {
+            gpxParser.parseGpx(inputGpx, gch);
+            List<List<TrackPoint>> segments = gch.getSegments();
+            if (segments.size() > 0) {
 
-        gpxParser.parseGpx(file, gch);
-        List<List<TrackPoint>> segments = gch.getSegments();
-        if (segments.size() > 0) {
-
-            log.info("Segments in total: {}", segments.size());
-            log.info("TrackPoints in the first segment: {}", segments.get(0).size());
+                log.info("Segments in total: {}", segments.size());
+                log.info("TrackPoints in the first segment: {}", segments.get(0).size());
+            }
+        } catch (final IOException e) {
+            throw new GpxException("error reading input file", e);
         }
     }
 
@@ -71,6 +76,6 @@ public class GeoController {
 
         model.addAttribute("segments", subscriber.getTrack());
 
-        return "map";
+        return "online";
     }
 }

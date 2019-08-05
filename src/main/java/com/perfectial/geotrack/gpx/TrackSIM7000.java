@@ -18,34 +18,34 @@ public class TrackSIM7000 extends TrackPoint {
     public static TrackSIM7000 fromCsv(String csv) {
         String[] strings = csv.split(",");
         TrackSIM7000 point = new TrackSIM7000();
-        if (!StringUtils.isEmpty(strings[0])) {
+        if (strings.length > 0 && !StringUtils.isEmpty(strings[0])) {
             point.setLon(Double.valueOf(strings[0]));
         }
-        if (!StringUtils.isEmpty(strings[1])) {
+        if (strings.length > 1 && !StringUtils.isEmpty(strings[1])) {
             point.setLat(Double.valueOf(strings[1]));
         }
-        if (!StringUtils.isEmpty(strings[2])) {
+        if (strings.length > 2 && !StringUtils.isEmpty(strings[2])) {
             point.bmeTemperature = Double.valueOf(strings[2]);
         }
-        if (!StringUtils.isEmpty(strings[3])) {
+        if (strings.length > 3 && !StringUtils.isEmpty(strings[3])) {
             point.bmeHumidity = Double.valueOf(strings[3]);
         }
-        if (!StringUtils.isEmpty(strings[4])) {
+        if (strings.length > 4 && !StringUtils.isEmpty(strings[4])) {
             point.bmePressure = strings[4];
         }
-        if (!StringUtils.isEmpty(strings[5])) {
+        if (strings.length > 5 && !StringUtils.isEmpty(strings[5])) {
             point.alsIlluminance = Double.valueOf(strings[5]);
         }
-        if (!StringUtils.isEmpty(strings[6])) {
+        if (strings.length > 6 && !StringUtils.isEmpty(strings[6])) {
             point.alsDirectSunLight = strings[6];
         }
-        if (!StringUtils.isEmpty(strings[7])) {
+        if (strings.length > 7 && !StringUtils.isEmpty(strings[7])) {
             point.shockDetected = strings[7];
         }
-        if (!StringUtils.isEmpty(strings[8])) {
+        if (strings.length > 8 && !StringUtils.isEmpty(strings[8])) {
             point.batteryPower = strings[8];
         }
-        if (!StringUtils.isEmpty(strings[9])) {
+        if (strings.length > 9 && !StringUtils.isEmpty(strings[9])) {
             point.signalStrength = strings[9];
         }
 

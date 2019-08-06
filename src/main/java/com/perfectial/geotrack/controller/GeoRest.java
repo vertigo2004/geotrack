@@ -17,8 +17,6 @@ public class GeoRest {
 
     @GetMapping("track")
     public String getTrack() {
-        String res = subscriber.getTrack();
-        log.info(res);
         return subscriber.getTrack();
     }
 
@@ -26,6 +24,4 @@ public class GeoRest {
     public void clear() {
         subscriber.clearQueue();
     }
-
-
 }

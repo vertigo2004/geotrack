@@ -41,13 +41,13 @@ var gpxFormat = new ol.format.GPX();
 
 function getTrack() {
     const Http = new XMLHttpRequest();
-    const url = 'http://localhost:8080/v1/online/track';
+    // const url = 'http://localhost:8080/v1/online/track';
+    const url = 'http://ec2-34-209-191-182.us-west-2.compute.amazonaws.com:8080/v1/online/track';
     Http.open("GET", url);
     Http.send();
 
     Http.onreadystatechange = (e) => {
         var segs = Http.responseText;
-        console.log(segs.substring(0, 100) + " " + segs.length);
         var features = gpxFormat.readFeatures(segs, {
             dataProjection: 'EPSG:4326',
             featureProjection: 'EPSG:3857'

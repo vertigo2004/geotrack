@@ -3,7 +3,6 @@
 <head>
     <title>OpenLayers Demo</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta http-equiv="refresh" content="5; URL=/online">
     <link rel="stylesheet" th:href="@{css/base.css}"/>
 
     <script th:src="@{v5.3.0-dist/ol.js}" th:inline="javascript" ></script>
@@ -18,9 +17,8 @@
     <h2 th:text="${message}"/>
 </div>
 
-<div id="basicMap" th:if="${segments}">
-    <script type="module" th:src="@{js/index.js}" th:inline="javascript">
-    </script>
+<div id="basicMap">
+    <script type="module" th:src="@{js/online.js}" th:inline="javascript"></script>
 </div>
 </body>
 </html>

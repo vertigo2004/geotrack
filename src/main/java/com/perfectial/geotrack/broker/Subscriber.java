@@ -107,4 +107,9 @@ public class Subscriber implements MqttCallback {
         sb.append("</gpx>");
         return sb.toString();
     }
+
+    public void clearQueue() {
+        this.trackPoints.clear();
+        this.lastPoint = null;
+    }
 }

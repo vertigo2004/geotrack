@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class GpxPublisher {
 
-    private static String FILENAME = "static/gpx/2019-07-15.gpx";
+    private static String FILENAME = "static/gpx/2019-06-26_12-44-59.gpx";
 
     private static String CLIENTID = "MQTT-Gpx-Publisher";
     private static String CSV_FORMAT = "%s,%s,,,,,,,,";

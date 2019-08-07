@@ -1,6 +1,7 @@
 package com.perfectial.geotrack.broker;
 
 import com.perfectial.geotrack.gpx.TrackSIM7000;
+import com.perfectial.geotrack.utils.BoundedQueue;
 import lombok.extern.slf4j.Slf4j;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -12,7 +13,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
 public class Subscriber implements MqttCallback {
@@ -72,26 +72,6 @@ public class Subscriber implements MqttCallback {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-    }
-
-    private class BoundedQueue<E> extends ConcurrentLinkedQueue<E> {
-        private static final long serialVersionUID = -1L;
-        private final int limit;
-
-        BoundedQueue(int limit) {
-            this.limit = limit;
-        }
-
-        @Override
-        public boolean add(E object) {
-            super.add(object);
-
-            while (Subscriber.this.trackPoints.size() > this.limit) {
-                Subscriber.this.trackPoints.poll();
-            }
-
-            return this.limit > 0;
-        }
     }
 
     public String getTrack() {

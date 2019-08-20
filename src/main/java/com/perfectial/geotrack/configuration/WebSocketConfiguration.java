@@ -31,7 +31,7 @@ public class WebSocketConfiguration {
     HandlerMapping handlerMapping(WebSocketHandler wsh) {
         return new SimpleUrlHandlerMapping() {
             {
-                setUrlMap(Collections.singletonMap("/ws/trackpoint", wsh));
+                setUrlMap(Collections.singletonMap("trackpoint", wsh));
                 setOrder(10);
             }
         };

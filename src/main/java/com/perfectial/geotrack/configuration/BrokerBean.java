@@ -1,6 +1,5 @@
 package com.perfectial.geotrack.configuration;
 
-import com.perfectial.geotrack.broker.TrackPointPublisher;
 import com.perfectial.geotrack.broker.Subscriber;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -25,9 +24,6 @@ public class BrokerBean {
     private String topic;
     @Value("${trackpoint.count}")
     private int trackpointCount;
-
-    @Value("#{tcp://${mosquitto.host}:${mosquitto.port}")
-    private String url;
 
     @Bean
     public MqttConnectOptions getMqttConnectOptions() {

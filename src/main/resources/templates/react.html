@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>OpenLayers Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{css/base.css}"/>
+
+    <script th:src="@{v5.3.0-dist/ol.js}" th:inline="javascript" ></script>
+    <link rel="stylesheet" th:href="@{v5.3.0-dist/ol.css}"/>
+
+</head>
+<body>
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+
+<script>
+    var socket = new WebSocket('ws://localhost/trackpoint');
+    socket.addEventListener('message', function (event) {
+        console.log('message from server: ' + event.data);
+    });
+</script>
+
+<!--<div id="basicMap">-->
+    <!--<script type="module" th:src="@{js/online.js}" th:inline="javascript"></script>-->
+<!--</div>-->
+</body>
+</html>

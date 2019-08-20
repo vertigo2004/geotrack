@@ -78,4 +78,10 @@ public class GeoController {
 
         return "online";
     }
+
+    @GetMapping("react")
+    public String reactive(Model model) throws IOException {
+        model.addAttribute("message","Reactive client");
+        return "react";
+    }
 }

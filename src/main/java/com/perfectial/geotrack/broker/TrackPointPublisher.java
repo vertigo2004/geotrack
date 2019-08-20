@@ -25,17 +25,16 @@ public class TrackPointPublisher implements MqttCallback, Consumer<FluxSink<Trac
 
     private final int QOS = 1;
     private final String SCHEMA = "tcp";
-    String CLIENTID = "MQTT-Java-Example";
+    String CLIENTID = "WebSocket";
 
     private final String topic;
     private final BlockingQueue<TrackSIM7000> trackPoints;
 
     private MqttClient client;
-
     private Executor executor;
 
     public TrackPointPublisher(MqttConnectOptions conOpt,
-                               @Value("#{tcp://${mosquitto.host}:${mosquitto.port}") String uri,
+                               @Value("#{'tcp://${mosquitto.host}:${mosquitto.port}'}") String uri,
                                @Value("${mosquitto.topic}") String topic,
                                @Value("${trackpoint.count}") int trackpointsLimit,
                                Executor executor

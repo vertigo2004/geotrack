@@ -1,9 +1,12 @@
 package com.perfectial.geotrack.gpx;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.util.StringUtils;
 
 @Data
+@ToString(callSuper = true)
 public class TrackSIM7000 extends TrackPoint {
 
     private Double bmeTemperature;
@@ -52,6 +55,7 @@ public class TrackSIM7000 extends TrackPoint {
         return point;
     }
 
+    @JsonIgnore
     protected void getExtensions(StringBuilder sb) {
         StringBuilder ext = new StringBuilder();
         if (bmeTemperature != null) {

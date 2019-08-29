@@ -1,5 +1,6 @@
 package com.perfectial.geotrack.gpx;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class TrackPoint {
     private Long time;
     private Double elevation;
 
+    @JsonIgnore
     public String getXML() {
         StringBuilder sb = new StringBuilder();
 
@@ -40,6 +42,7 @@ public class TrackPoint {
         return sb.toString();
     }
 
+    @JsonIgnore
     protected void getExtensions(StringBuilder sb) {
     }
 }

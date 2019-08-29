@@ -5,20 +5,36 @@ function connect()
 {
     sse = new EventSource(url);
 
+    sse.addEventListener("thing-event", function(event) {
+        console.log(event.lastEventId)
+        log(event.data)
+        });
+
+    sse.onopen = function (event) {
+        log("Connected");
+    };
+
     sse.onmessage = function (event) {
+        console.log(event.lastEventId)
         log(event.data);
     };
 
-    sse.doOnNext = function (event) {
-        log(event.data);
-    }
+    sse.onerror = e => {
+        if (e.readyState == EventSource.CLOSED) {
+            console.log('close');
+        }
+        else {
+            console.log(e);
+        }
+    };
 
 }
 
 function log(message)
 {
-    var console = document.getElementById('logging');
+    var logConsole = document.getElementById('logging');
     var p = document.createElement('p');
     p.appendChild(document.createTextNode(message));
-    console.appendChild(p);
+    logConsole.appendChild(p);
+    console.log(message);
 }

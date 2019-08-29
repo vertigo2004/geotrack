@@ -9,9 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 @Configuration
 @PropertySource(value= {"classpath:broker.properties"})
 public class BrokerBean {
@@ -26,8 +23,8 @@ public class BrokerBean {
     private String password;
     @Value("${mosquitto.topic}")
     private String topic;
-    @Value("${trackpoint.count}")
-    private int trackpointCount;
+    @Value("${trackpoint.limit}")
+    private int trackpointLimit;
     @Value("#{'tcp://${mosquitto.host}:${mosquitto.port}'}") String uri;
 
     @Bean
@@ -41,16 +38,12 @@ public class BrokerBean {
 
     @Bean
     public Subscriber getSubscriber() throws MqttException {
-        return new Subscriber(uri, getMqttConnectOptions(), topic, trackpointCount);
+        return new Subscriber(uri, getMqttConnectOptions(), topic, trackpointLimit);
     }
 
     @Bean
     public SSEPublisher getSSEPublisher() throws MqttException {
-        return new SSEPublisher(uri, getMqttConnectOptions(), topic, trackpointCount, getExecutor());
+        return new SSEPublisher(uri, getMqttConnectOptions(), topic, trackpointLimit);
     }
 
-    @Bean
-    public Executor getExecutor() {
-        return Executors.newSingleThreadExecutor();
-    }
 }

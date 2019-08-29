@@ -4,8 +4,8 @@ import com.perfectial.geotrack.broker.SSEPublisher;
 import com.perfectial.geotrack.gpx.TrackSIM7000;
 import lombok.extern.slf4j.Slf4j;
 
-
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,13 +16,11 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("v1/sse")
+@EnableAsync
 public class SSEController {
-//    private ObjectMapper objectMapper;
     private Flux<TrackSIM7000> publish;
 
-    public SSEController(// ObjectMapper objectMapper,
-                         SSEPublisher eventPublisher) {
-//        this.objectMapper = objectMapper;
+    public SSEController(SSEPublisher eventPublisher) {
         this.publish = Flux.create(eventPublisher).share();
     }
 
@@ -31,10 +29,11 @@ public class SSEController {
 
         Flux<ServerSentEvent<TrackSIM7000>> messageFlux = publish
                 .map(tp -> {
-                        log.info("sending: " + tp);
+                    String id = UUID.randomUUID().toString();
+                        log.info("Sending SSE - > ID: {}, Data: {} ", id, tp);
                         return ServerSentEvent.<TrackSIM7000> builder()
-                                .id(UUID.randomUUID().toString())
-                                .event("periodic-event")
+                                .id(id)
+                                .event("thing-event")
                                 .data(tp)
                                 .build();
                 });

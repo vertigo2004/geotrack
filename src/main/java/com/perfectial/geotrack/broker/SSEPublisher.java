@@ -15,6 +15,7 @@ import reactor.core.publisher.FluxSink;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -27,17 +28,14 @@ public class SSEPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM700
     private final BlockingQueue<TrackSIM7000> trackPoints;
 
     private MqttClient client;
-    private Executor executor;
 
     public SSEPublisher(String uri,
                         MqttConnectOptions conOpt,
                         String topic,
-                        int trackpointLimit,
-                        Executor executor
+                        int trackpointLimit
     ) throws MqttException {
 
         this.topic = topic;
-        this.executor = executor;
         this.trackPoints = new BoundedQueue<>(trackpointLimit);
 
         this.client = new MqttClient(uri, CLIENTID, new MemoryPersistence());
@@ -50,7 +48,9 @@ public class SSEPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM700
 
     @Override
     public void accept(FluxSink<TrackSIM7000> sink) {
-        this.executor.execute(() -> {
+        Executor executor = Executors.newSingleThreadExecutor();
+
+        executor.execute(() -> {
             while (true) {
                 try {
                     TrackSIM7000 event = trackPoints.take();
@@ -71,7 +71,7 @@ public class SSEPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM700
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
         String payload = new String(mqttMessage.getPayload());
-        log.info("Topic: {}. Message received: {}", this.topic, payload);
+        log.info("Message Arrived: {}", payload);
         trackPoints.add(TrackSIM7000.fromCsv(payload));
     }
 

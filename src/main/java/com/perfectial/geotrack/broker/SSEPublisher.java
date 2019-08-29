@@ -10,8 +10,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.FluxSink;
 
@@ -20,12 +18,10 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 @Slf4j
-@Component
-public class TrackPointPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM7000>> {
+public class SSEPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM7000>> {
 
     private final int QOS = 1;
-    private final String SCHEMA = "tcp";
-    String CLIENTID = "WebSocket";
+    String CLIENTID = "SSE";
 
     private final String topic;
     private final BlockingQueue<TrackSIM7000> trackPoints;
@@ -33,15 +29,16 @@ public class TrackPointPublisher implements MqttCallback, Consumer<FluxSink<Trac
     private MqttClient client;
     private Executor executor;
 
-    public TrackPointPublisher(MqttConnectOptions conOpt,
-                               @Value("#{'tcp://${mosquitto.host}:${mosquitto.port}'}") String uri,
-                               @Value("${mosquitto.topic}") String topic,
-                               @Value("${trackpoint.count}") int trackpointsLimit,
-                               Executor executor
+    public SSEPublisher(String uri,
+                        MqttConnectOptions conOpt,
+                        String topic,
+                        int trackpointLimit,
+                        Executor executor
     ) throws MqttException {
+
         this.topic = topic;
         this.executor = executor;
-        this.trackPoints = new BoundedQueue<>(trackpointsLimit);
+        this.trackPoints = new BoundedQueue<>(trackpointLimit);
 
         this.client = new MqttClient(uri, CLIENTID, new MemoryPersistence());
         this.client.setCallback(this);

@@ -18,34 +18,22 @@ import java.util.Queue;
 public class Subscriber implements MqttCallback {
 
     private final int QOS = 1;
-    private final String SCHEMA = "tcp";
+
     String CLIENTID = "MQTT-Java-Example";
 
-    private final String host;
-    private final String port;
-    private final String username;
-    private final String password;
     private final String topic;
     private final Queue<TrackSIM7000> trackPoints;
     private TrackSIM7000 lastPoint;
 
     private MqttClient client;
 
-    public Subscriber(String host, String port, String username, String password, String topic, int trackpointsCount
+    public Subscriber(String uri, MqttConnectOptions conOpt, String topic, int trackpointLimit
     ) throws MqttException {
-        this.host = host;
-        this.port = port;
-        this.username = username;
-        this.password = password;
         this.topic = topic;
-        this.trackPoints = new BoundedQueue<>(trackpointsCount);
+        this.trackPoints = new BoundedQueue<>(trackpointLimit);
 
-        log.info("Host: {}, Port: {}, UserName: {}, Password: {}", host, port, username, password);
-        MqttConnectOptions conOpt = new MqttConnectOptions();
-        conOpt.setCleanSession(true);
-        conOpt.setUserName(username);
-        conOpt.setPassword(password.toCharArray());
-        String uri = String.format("%s://%s:%s", SCHEMA, host, port);
+        log.info("URI: {}, Connection Options: {}", uri, conOpt.toString());
+
         this.client = new MqttClient(uri, CLIENTID, new MemoryPersistence());
         this.client.setCallback(this);
         this.client.connect(conOpt);

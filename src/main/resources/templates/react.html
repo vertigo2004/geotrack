@@ -5,10 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" th:href="@{css/base.css}"/>
 
-    <!--<script th:src="@{v5.3.0-dist/ol.js}" th:inline="javascript"></script>-->
-    <!--<link rel="stylesheet" th:href="@{v5.3.0-dist/ol.css}"/>-->
-
-    <script th:src="@{js/sse.js}" th:inline="javascript"></script>
+    <script th:src="@{v5.3.0-dist/ol.js}" th:inline="javascript"></script>
+    <link rel="stylesheet" th:href="@{v5.3.0-dist/ol.css}"/>
 
 </head>
 <body>
@@ -16,14 +14,9 @@
     <h2 th:text="${message}"/>
 </div>
 
-<script>
-    connect();
-</script>
-
 <div id="logging"></div>
 
-<!--<div id="basicMap">-->
-<!--<script type="module" th:src="@{js/online.js}" th:inline="javascript"></script>-->
-<!--</div>-->
+<div id="basicMap"></div>
+<script th:type="module" th:src="@{js/sse.js}" th:inline="javascript"></script>
 </body>
 </html>

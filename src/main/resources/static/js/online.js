@@ -8,6 +8,11 @@ var raster = new ol.layer.Tile({
     source: new ol.source.OSM()
 });
 
+var gpxFormatOptions = {
+    dataProjection: 'EPSG:4326',
+    featureProjection: 'EPSG:3857'
+};
+
 var style = {
     'Point': new ol.style.Style({
         image: new ol.style.RegularShape({
@@ -48,10 +53,7 @@ function getTrack() {
 
     Http.onreadystatechange = (e) => {
         var segs = Http.responseText;
-        var features = gpxFormat.readFeatures(segs, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857'
-        });
+        var features = gpxFormat.readFeatures(segs, gpxFormatOptions);
 
         var vectorLayer = map.getLayers().getArray()[1];
         var src = vectorLayer.getSource();
@@ -61,10 +63,7 @@ function getTrack() {
     }
 }
 
-var gpxSegments = gpxFormat.readFeatures(segments, {
-    dataProjection : 'EPSG:4326',
-    featureProjection : 'EPSG:3857'
-});
+var gpxSegments = gpxFormat.readFeatures(segments, gpxFormatOptions);
 
 var vectorSource = new ol.source.Vector({
     format: gpxFormat,

@@ -21,8 +21,8 @@ var style = {
     }),
     'LineString': new ol.style.Style({
         stroke: new ol.style.Stroke({
-            color: '#0f0',
-            width: 3
+            color: '#f00',
+            width: 5
         })
     }),
     'MultiLineString': new ol.style.Style({
@@ -78,18 +78,16 @@ var vector = new ol.layer.Vector({
     }
 });
 
-source.on('addfeature', function(e) {
-    // flash(e.feature);
-    map.render();
-});
-
 map.addLayer(vector);
 connect();
 
 function dynamicDraw(data) {
     if (data != null) {
-        var geom = new ol.geom.Point(ol.proj.fromLonLat([data.lon, data.lat]));
-        var feature = new ol.Feature(geom);
+        coordinates.push(ol.proj.fromLonLat([data.lon, data.lat]));
+        var geomP = new ol.geom.Point(ol.proj.fromLonLat([data.lon, data.lat]));
+        var geomL = new ol.geom.LineString(coordinates);
+        var feature = new ol.Feature(geomL);
+        source.clear(true);
         source.addFeature(feature);
     }
 }
@@ -103,12 +101,12 @@ function connect()
         });
 
     sse.onopen = function (event) {
-        log("Connected");
+        console.log("Connected");
     };
 
     sse.onmessage = function (event) {
         console.log(event.lastEventId)
-        log(event.data);
+        console.log(event.data);
     };
 
     sse.onerror = e => {
@@ -120,13 +118,4 @@ function connect()
         }
     };
 
-}
-
-function log(message)
-{
-    var logConsole = document.getElementById('logging');
-    var p = document.createElement('p');
-    p.appendChild(document.createTextNode(message));
-    logConsole.appendChild(p);
-    console.log(message);
 }

@@ -29,13 +29,13 @@ public class GeoController {
     @Autowired
     Subscriber subscriber;
 
-    @GetMapping("/")
+    @GetMapping("/gpx")
     public String showMap(Model model)  throws IOException {
 
         return "map";
     }
 
-    @PostMapping("/")
+    @PostMapping("/gpx")
     public String processGPX(@RequestParam("file") MultipartFile file,
                              RedirectAttributes redirectAttributes
     ) throws IOException {
@@ -47,7 +47,7 @@ public class GeoController {
         String gpxContent = new String(file.getBytes());
         redirectAttributes.addFlashAttribute("segments", gpxContent);
 
-        return "redirect:/";
+        return "redirect:/gpx";
     }
 
     private void getGpxStats(MultipartFile file) {
@@ -69,17 +69,7 @@ public class GeoController {
         }
     }
 
-    @GetMapping("online")
-    public String online(Model model) throws IOException {
-
-        model.addAttribute("message","Following the Thing on-line");
-
-        model.addAttribute("segments", subscriber.getTrack());
-
-        return "online";
-    }
-
-    @GetMapping("react")
+    @GetMapping("/")
     public String reactive(Model model) throws IOException {
         model.addAttribute("message","Reactive client");
         return "react";

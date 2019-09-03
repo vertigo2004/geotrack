@@ -1,7 +1,6 @@
 package com.perfectial.geotrack.configuration;
 
 import com.perfectial.geotrack.broker.SSEPublisher;
-import com.perfectial.geotrack.broker.Subscriber;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,11 +33,6 @@ public class BrokerBean {
         conOpt.setUserName(username);
         conOpt.setPassword(password.toCharArray());
         return conOpt;
-    }
-
-    @Bean
-    public Subscriber getSubscriber() throws MqttException {
-        return new Subscriber(uri, getMqttConnectOptions(), topic, trackpointLimit);
     }
 
     @Bean

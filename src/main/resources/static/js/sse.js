@@ -1,10 +1,12 @@
 var coordinates = [];
-
+var needInitialZoom = true;
 var sse = null;
 var url = "http://localhost:8080/v1/sse/trackme";
 
+var defaultZoom = 15;
 
-var style = {
+
+var styles = {
     'Point': new ol.style.Style({
         image: new ol.style.RegularShape({
             fill: new ol.style.Fill({
@@ -30,70 +32,76 @@ var style = {
             color: '#f00',
             width: 5
         })
+    }),
+    'geoMarker': new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 7,
+            fill: new ol.style.Fill({color: 'black'}),
+            stroke: new ol.style.Stroke({
+                color: 'white', width: 2
+            })
+        })
     })
 };
+
+var lineGeometry = new ol.geom.LineString([]);
+
+var feature = new ol.Feature(lineGeometry);
+
+var source = new ol.source.Vector({
+    wrapX: false,
+    features: [feature]
+});
+var vector = new ol.layer.Vector({
+    source: source,
+    style: function (feature) {
+        return styles[feature.getGeometry().getType()];
+    }
+});
 
 var map = new ol.Map({
     layers: [
         new ol.layer.Tile({
             source: new ol.source.OSM()
-        })
+        }),
+        vector
     ],
     target: 'basicMap',
+    loadTilesWhileAnimating: true,
     view: new ol.View({
         center: [0, 0],
         zoom: 2
     })
 });
-
-var imageStyle = new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 5,
-        fill: new ol.style.Fill({color: 'yellow'}),
-        stroke: new ol.style.Stroke({color: 'red', width: 1})
-    })
-});
-
-var headInnerImageStyle = new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 2,
-        fill: new ol.style.Fill({color: 'blue'})
-    })
-});
-
-var headOuterImageStyle = new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 5,
-        fill: new ol.style.Fill({color: 'black'})
-    })
-});
-
-var source = new ol.source.Vector({
-    wrapX: false
-});
-var vector = new ol.layer.Vector({
-    source: source,
-    style: function (feature) {
-        return style[feature.getGeometry().getType()];
-    }
-});
-
-map.addLayer(vector);
 connect();
 
-function dynamicDraw(data) {
-    if (data != null) {
-        coordinates.push(ol.proj.fromLonLat([data.lon, data.lat]));
-        var geomP = new ol.geom.Point(ol.proj.fromLonLat([data.lon, data.lat]));
-        var geomL = new ol.geom.LineString(coordinates);
-        var feature = new ol.Feature(geomL);
-        source.clear(true);
-        source.addFeature(feature);
+function zoom2Fit() {
+    var extent = vector.getSource().getExtent();
+    map.getView().fit(extent, map.getSize());
+    if (map.getView().getZoom() > defaultZoom) {
+        map.getView().setZoom(defaultZoom);
     }
 }
 
-function connect()
-{
+fitButton.onclick = function () {
+    zoom2Fit();
+};
+
+
+function dynamicDraw(data) {
+    var coord = ol.proj.fromLonLat([data.lon, data.lat]);
+    // var geomP = new ol.geom.Point(coord);
+    lineGeometry.appendCoordinate(coord);
+    feature.setGeometry(lineGeometry);
+
+    if (needInitialZoom) {
+        zoom2Fit();
+        needInitialZoom = false;
+    }
+}
+
+function connect() {
+
     sse = new EventSource(url);
 
     sse.addEventListener("thing-event", function(event) {
@@ -101,6 +109,7 @@ function connect()
         });
 
     sse.onopen = function (event) {
+        needInitialZoom = true;
         console.log("Connected");
     };
 

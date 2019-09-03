@@ -1,6 +1,5 @@
 package com.perfectial.geotrack.controller;
 
-import com.perfectial.geotrack.broker.Subscriber;
 import com.perfectial.geotrack.gpx.GpxContentHandler;
 import com.perfectial.geotrack.gpx.GpxException;
 import com.perfectial.geotrack.gpx.GpxParser;
@@ -25,9 +24,6 @@ public class GeoController {
 
     @Autowired
     GpxParser gpxParser;
-
-    @Autowired
-    Subscriber subscriber;
 
     @GetMapping("/gpx")
     public String showMap(Model model)  throws IOException {

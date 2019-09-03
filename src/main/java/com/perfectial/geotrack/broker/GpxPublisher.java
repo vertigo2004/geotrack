@@ -33,6 +33,7 @@ public class GpxPublisher {
     private IMqttClient client;
 
     private GpxParser gpxParser = new GpxParser();
+    private static double timeScale = 1;
 
 
     public GpxPublisher() throws MqttException {
@@ -66,7 +67,7 @@ public class GpxPublisher {
         for (List<TrackPoint> trackPoints : track) {
             for (TrackPoint point : trackPoints) {
                 if (prev != null) {
-                    long toWait = System.currentTimeMillis() + (point.getTime() - prev.getTime());
+                    double toWait = System.currentTimeMillis() + ((point.getTime() - prev.getTime())) * timeScale;
                     while (System.currentTimeMillis() < toWait) {
                         // wait
                     }
@@ -75,6 +76,8 @@ public class GpxPublisher {
                 prev = point;
             }
         }
+        client.disconnect();
+        client.close();
     }
 
     private void publish(TrackPoint trackPoint) throws Exception {

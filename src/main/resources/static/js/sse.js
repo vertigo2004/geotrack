@@ -83,6 +83,22 @@ function zoom2Fit() {
     }
 }
 
+function updateInfoDiv(data) {
+    document.getElementById('info')
+        .innerHTML =
+            "Position: " + data.lat.toString().substring(0, 9) + " " + data.lon.toString().substring(0, 9) + "<br>" +
+            "Time: " + data.time + "<br>" +
+            "Elevation: " + data.elevation + "<br>" +
+            "Temperature: " + data.bmeTemperature + "<br>" +
+            "Humidity: " + data.bmeHumidity + "<br>" +
+            "Pressure: " + data.bmePressure + "<br>" +
+            "Illuminance: " + data.alsIlluminance + "<br>" +
+            "DirectSunLight: " + data.alsDirectSunLight + "<br>" +
+            "ShockDetected: " + data.shockDetected + "<br>" +
+            "BatteryPower: " + data.batteryPower + "<br>" +
+            "SignalStrength: " + data.signalStrength;
+}
+
 fitButton.onclick = function () {
     zoom2Fit();
 };
@@ -105,7 +121,9 @@ function connect() {
     sse = new EventSource(url);
 
     sse.addEventListener("thing-event", function(event) {
-        dynamicDraw(JSON.parse(event.data));
+        var data = JSON.parse(event.data)
+        dynamicDraw(data);
+        updateInfoDiv(data);
         });
 
     sse.onopen = function (event) {

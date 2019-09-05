@@ -67,7 +67,6 @@ public class GeoController {
 
     @GetMapping("/")
     public String reactive(Model model) throws IOException {
-        model.addAttribute("message","Reactive client");
         return "react";
     }
 }

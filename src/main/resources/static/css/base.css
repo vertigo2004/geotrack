@@ -3,3 +3,23 @@ html, body, #basicMap {
     height: 100%;
     margin: 0;
 }
+
+#info {
+    position: absolute;
+    font-size: 0.7em;
+    top: 10px;
+    right: 10px;
+    color: #333;
+    background-color: lightgrey;
+    padding: 4px;
+    font-family: 'Quattrocento Sans', sans-serif;
+    display: block;
+}
+
+#control-panel {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 4px;
+    display: block;
+}

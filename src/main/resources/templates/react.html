@@ -8,8 +8,10 @@
     <script th:src="@{v5.3.0-dist/ol.js}" th:inline="javascript"></script>
     <link rel="stylesheet" th:href="@{v5.3.0-dist/ol.css}"/>
 
+    <script th:src="@{js/sse.js}" th:inline="javascript"></script>
 </head>
-<body>
+
+<body th:onload="showMap([[${service}]])">
 
 <div id="basicMap"></div>
 <div id="info"></div>
@@ -18,6 +20,5 @@
     <input id="switchTiles" value="Switch Tiles" type="button">
 </div>
 
-<script th:type="module" th:src="@{js/sse.js}" th:inline="javascript"></script>
 </body>
 </html>

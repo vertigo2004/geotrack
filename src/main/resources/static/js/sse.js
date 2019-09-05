@@ -5,7 +5,6 @@ var url = "http://localhost:8080/v1/sse/trackme";
 
 var defaultZoom = 15;
 
-
 var styles = {
     'Point': new ol.style.Style({
         image: new ol.style.RegularShape({
@@ -52,6 +51,7 @@ var source = new ol.source.Vector({
     wrapX: false,
     features: [feature]
 });
+
 var vector = new ol.layer.Vector({
     source: source,
     style: function (feature) {
@@ -59,18 +59,33 @@ var vector = new ol.layer.Vector({
     }
 });
 
+var layers = [
+    new ol.layer.Tile({
+        visible: true,
+        preload: Infinity,
+        source: new ol.source.OSM(),
+    }),
+    new ol.layer.Tile({
+        visible: false,
+        source: new ol.source.OSM({
+            attributions: [
+                'All maps © <a href="https://www.opencyclemap.org/">OpenCycleMap</a>',
+                ol.source.OSM.ATTRIBUTION
+            ],
+            url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png' +
+            '?apikey=5c87c3e03ba8482db563ee8aee3d6421'
+        })
+    }),
+    vector
+];
+
 var map = new ol.Map({
-    layers: [
-        new ol.layer.Tile({
-            source: new ol.source.OSM()
-        }),
-        vector
-    ],
+    layers: layers,
     target: 'basicMap',
     loadTilesWhileAnimating: true,
     view: new ol.View({
         center: [0, 0],
-        zoom: 2
+        zoom: 3
     })
 });
 connect();
@@ -103,6 +118,11 @@ fitButton.onclick = function () {
     zoom2Fit();
 };
 
+switchTiles.onclick = function () {
+    for (var i = 0; i < layers.length - 1; ++i) {
+        layers[i].setVisible(!layers[i].getVisible());
+    }
+};
 
 function dynamicDraw(data) {
     var coord = ol.proj.fromLonLat([data.lon, data.lat]);

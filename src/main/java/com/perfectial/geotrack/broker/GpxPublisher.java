@@ -14,6 +14,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +23,9 @@ public class GpxPublisher {
     private static String FILENAME = "static/gpx/2019-07-09.gpx";
 
     private static String CLIENTID = "MQTT-Gpx-Publisher";
-    private static String CSV_FORMAT = "%s,%s,,,,,,,,";
+    private static String CSV_FORMAT = "%s,%s,,,,,,,,,,%s";
+
+    private SimpleDateFormat sdf = new SimpleDateFormat(SSEPublisher.DATE_TIME_FORMAT);
 
     private static String HOST = "ec2-35-160-22-112.us-west-2.compute.amazonaws.com";
     private static String PORT = "1883";
@@ -67,7 +70,9 @@ public class GpxPublisher {
         for (List<TrackPoint> trackPoints : track) {
             for (TrackPoint point : trackPoints) {
                 if (prev != null) {
-                    double toWait = System.currentTimeMillis() + ((point.getTime() - prev.getTime())) * timeScale;
+                    double toWait = System.currentTimeMillis()
+                            + ((point.getTime().getTime() - prev.getTime().getTime()))
+                            * timeScale;
                     while (System.currentTimeMillis() < toWait) {
                         // wait
                     }
@@ -85,7 +90,7 @@ public class GpxPublisher {
             log.error("MQTT client is not connected.");
             throw new Exception("MQTT client is not connected.");
         }
-        String payload = String.format(CSV_FORMAT, trackPoint.getLon(), trackPoint.getLat());
+        String payload = String.format(CSV_FORMAT, trackPoint.getLon(), trackPoint.getLat(), sdf.format(trackPoint.getTime()));
         MqttMessage msg = new MqttMessage(payload.getBytes());
         msg.setQos(0);
         msg.setRetained(true);

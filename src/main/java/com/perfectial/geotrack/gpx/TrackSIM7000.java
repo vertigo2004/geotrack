@@ -3,11 +3,18 @@ package com.perfectial.geotrack.gpx;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Data
+@Slf4j
 @ToString(callSuper = true)
 public class TrackSIM7000 extends TrackPoint {
+
 
     private Double bmeTemperature;
     private Double bmeHumidity;
@@ -15,10 +22,11 @@ public class TrackSIM7000 extends TrackPoint {
     private Double alsIlluminance;
     private String alsDirectSunLight;
     private String shockDetected;
-    private String batteryPower;
+    private Double batteryCharged;
+    private Double batteryPower;
     private String signalStrength;
 
-    public static TrackSIM7000 fromCsv(String csv) {
+    public static TrackSIM7000 fromCsv(String csv, SimpleDateFormat sdf) {
         String[] strings = csv.split(",");
         TrackSIM7000 point = new TrackSIM7000();
         if (strings.length > 0 && !StringUtils.isEmpty(strings[0])) {
@@ -46,10 +54,21 @@ public class TrackSIM7000 extends TrackPoint {
             point.shockDetected = strings[7];
         }
         if (strings.length > 8 && !StringUtils.isEmpty(strings[8])) {
-            point.batteryPower = strings[8];
+            point.signalStrength = strings[8];
         }
         if (strings.length > 9 && !StringUtils.isEmpty(strings[9])) {
-            point.signalStrength = strings[9];
+            point.batteryCharged = Double.valueOf(strings[9]);
+        }
+        if (strings.length > 10 && !StringUtils.isEmpty(strings[10])) {
+            point.batteryPower = Double.valueOf(strings[10]);
+        }
+        if (strings.length > 12 && !StringUtils.isEmpty(strings[11]) && !StringUtils.isEmpty(strings[12])) {
+            String datetime = strings[11] + "," + strings[12];
+            try {
+                point.setTime(sdf.parse(datetime));
+            } catch (ParseException e) {
+                log.warn("Error parsing date '{}'", datetime, e);
+            }
         }
 
         return point;
@@ -87,5 +106,4 @@ public class TrackSIM7000 extends TrackPoint {
             sb.append("<extensions>").append(ext).append("</extensions>");
         }
     }
-
 }

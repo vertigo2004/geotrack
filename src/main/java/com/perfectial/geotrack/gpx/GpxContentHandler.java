@@ -2,6 +2,7 @@ package com.perfectial.geotrack.gpx;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.xml.sax.Attributes;
@@ -21,7 +22,7 @@ public final class GpxContentHandler extends DefaultHandler {
     private List<TrackPoint> trackSegment;
 
     private StringBuilder sb;
-    private long time = Long.MIN_VALUE;
+    private Date time = new Date();
     private double lat;
     private double lon;
     private double ele;
@@ -53,10 +54,9 @@ public final class GpxContentHandler extends DefaultHandler {
             trackSegment = null;
         } else if (ELEM_TRKPT.equals(qName)) {
             trackSegment.add(new TrackPoint(lat, lon, time, ele));
-            time = Long.MIN_VALUE;
         } else if (ELEM_TIME.equals(qName)) {
             final ZonedDateTime dateTime = ZonedDateTime.parse(sb.toString());
-            time = dateTime.toInstant().toEpochMilli();
+            time = Date.from(dateTime.toInstant());
             sb = null;
         } else if (ELEM_ELE.equals(qName)) {
             ele = Double.parseDouble(sb.toString());

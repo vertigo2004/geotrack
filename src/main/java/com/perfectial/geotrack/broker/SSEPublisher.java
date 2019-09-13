@@ -13,6 +13,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.FluxSink;
 
+import java.text.SimpleDateFormat;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -28,6 +29,9 @@ public class SSEPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM700
     private final BlockingQueue<TrackSIM7000> trackPoints;
 
     private MqttClient client;
+
+    public static String DATE_TIME_FORMAT = "yy/MM/dd,hh:mm:ss";
+    private SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_FORMAT);
 
     public SSEPublisher(String uri,
                         MqttConnectOptions conOpt,
@@ -72,7 +76,7 @@ public class SSEPublisher implements MqttCallback, Consumer<FluxSink<TrackSIM700
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
         String payload = new String(mqttMessage.getPayload());
         log.info("Message Arrived: {}", payload);
-        trackPoints.add(TrackSIM7000.fromCsv(payload));
+        trackPoints.add(TrackSIM7000.fromCsv(payload, sdf));
     }
 
     @Override

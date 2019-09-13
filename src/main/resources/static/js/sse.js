@@ -110,6 +110,7 @@ function updateInfoDiv(data) {
         "Illuminance: " + data.alsIlluminance + "<br>" +
         "DirectSunLight: " + data.alsDirectSunLight + "<br>" +
         "ShockDetected: " + data.shockDetected + "<br>" +
+        "BatteryCharged: " + data.batteryCharged + "<br>" +
         "BatteryPower: " + data.batteryPower + "<br>" +
         "SignalStrength: " + data.signalStrength;
 }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,7 +14,7 @@ public class TrackPoint {
 
     private Double lat;
     private Double lon;
-    private Long time;
+    private Date time;
     private Double elevation;
 
     @JsonIgnore

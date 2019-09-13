@@ -24,7 +24,7 @@ public class GpxPublisher {
     private static String CLIENTID = "MQTT-Gpx-Publisher";
     private static String CSV_FORMAT = "%s,%s,,,,,,,,";
 
-    private static String HOST = "ec2-34-209-191-182.us-west-2.compute.amazonaws.com";
+    private static String HOST = "ec2-35-160-22-112.us-west-2.compute.amazonaws.com";
     private static String PORT = "1883";
     private static String USERNAME = "perfectial";
     private static String PASSWORD = "123Perfectial456";

@@ -1,15 +1,15 @@
 package com.perfectial.geotrack.configuration;
 
 import com.perfectial.geotrack.broker.SSEPublisher;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource(value= {"classpath:broker.properties"})
+@Slf4j
 public class BrokerBean {
 
     @Value("${mosquitto.host}")
@@ -28,10 +28,12 @@ public class BrokerBean {
 
     @Bean
     public MqttConnectOptions getMqttConnectOptions() {
+        log.info("MqttConnectOptions URI: {}", uri);
         MqttConnectOptions conOpt = new MqttConnectOptions();
         conOpt.setCleanSession(true);
         conOpt.setUserName(username);
         conOpt.setPassword(password.toCharArray());
+        log.info("MqttConnectOptions: {}",conOpt);
         return conOpt;
     }
 

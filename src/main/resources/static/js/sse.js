@@ -1,9 +1,8 @@
-function showMap(service) {
-    var coordinates = [];
-    var needInitialZoom = true;
-    var sse = null;
+var needInitialZoom = true;
+var defaultZoom = 15;
+var url = "/v1/sse/trackme";
 
-    var defaultZoom = 15;
+function showMap() {
 
     var styles = {
         'Point': new ol.style.Style({
@@ -88,82 +87,80 @@ function showMap(service) {
             zoom: 3
         })
     });
-    connect(service);
+    connect();
+}
 
-    function zoom2Fit() {
-        var extent = vector.getSource().getExtent();
-        map.getView().fit(extent, map.getSize());
-        if (map.getView().getZoom() > defaultZoom) {
-            map.getView().setZoom(defaultZoom);
-        }
+function zoom2Fit() {
+    var extent = vector.getSource().getExtent();
+    map.getView().fit(extent, map.getSize());
+    if (map.getView().getZoom() > defaultZoom) {
+        map.getView().setZoom(defaultZoom);
     }
+}
 
-    function updateInfoDiv(data) {
-        document.getElementById('info')
-            .innerHTML =
-            "Position: " + data.lat.toString().substring(0, 9) + " " + data.lon.toString().substring(0, 9) + "<br>" +
-            "Time: " + data.time + "<br>" +
-            "Elevation: " + data.elevation + "<br>" +
-            "Temperature: " + data.bmeTemperature + "<br>" +
-            "Humidity: " + data.bmeHumidity + "<br>" +
-            "Pressure: " + data.bmePressure + "<br>" +
-            "Illuminance: " + data.alsIlluminance + "<br>" +
-            "DirectSunLight: " + data.alsDirectSunLight + "<br>" +
-            "ShockDetected: " + data.shockDetected + "<br>" +
-            "BatteryPower: " + data.batteryPower + "<br>" +
-            "SignalStrength: " + data.signalStrength;
+function updateInfoDiv(data) {
+    document.getElementById('info')
+        .innerHTML =
+        "Position: " + data.lat.toString().substring(0, 9) + " " + data.lon.toString().substring(0, 9) + "<br>" +
+        "Time: " + data.time + "<br>" +
+        "Elevation: " + data.elevation + "<br>" +
+        "Temperature: " + data.bmeTemperature + "<br>" +
+        "Humidity: " + data.bmeHumidity + "<br>" +
+        "Pressure: " + data.bmePressure + "<br>" +
+        "Illuminance: " + data.alsIlluminance + "<br>" +
+        "DirectSunLight: " + data.alsDirectSunLight + "<br>" +
+        "ShockDetected: " + data.shockDetected + "<br>" +
+        "BatteryPower: " + data.batteryPower + "<br>" +
+        "SignalStrength: " + data.signalStrength;
+}
+
+fitButton.onclick = function () {
+    zoom2Fit();
+};
+
+switchTiles.onclick = function () {
+    for (var i = 0; i < layers.length - 1; ++i) {
+        layers[i].setVisible(!layers[i].getVisible());
     }
+};
 
-    fitButton.onclick = function () {
+function dynamicDraw(data) {
+    var coord = ol.proj.fromLonLat([data.lon, data.lat]);
+    // var geomP = new ol.geom.Point(coord);
+    lineGeometry.appendCoordinate(coord);
+    feature.setGeometry(lineGeometry);
+
+    if (needInitialZoom) {
         zoom2Fit();
+        needInitialZoom = false;
+    }
+}
+
+function connect() {
+    var sse = new EventSource(url);
+
+    sse.addEventListener("thing-event", function (event) {
+        var data = JSON.parse(event.data)
+        dynamicDraw(data);
+        updateInfoDiv(data);
+    });
+
+    sse.onopen = function (event) {
+        needInitialZoom = true;
+        console.log("Connected");
     };
 
-    switchTiles.onclick = function () {
-        for (var i = 0; i < layers.length - 1; ++i) {
-            layers[i].setVisible(!layers[i].getVisible());
-        }
+    sse.onmessage = function (event) {
+        console.log(event.lastEventId)
+        console.log(event.data);
     };
 
-    function dynamicDraw(data) {
-        var coord = ol.proj.fromLonLat([data.lon, data.lat]);
-        // var geomP = new ol.geom.Point(coord);
-        lineGeometry.appendCoordinate(coord);
-        feature.setGeometry(lineGeometry);
-
-        if (needInitialZoom) {
-            zoom2Fit();
-            needInitialZoom = false;
+    sse.onerror = e => {
+        if (e.readyState == EventSource.CLOSED) {
+            console.log('close');
         }
-    }
-
-    function connect(service) {
-        var url = service +"/v1/sse/trackme";
-        sse = new EventSource(url);
-
-        sse.addEventListener("thing-event", function (event) {
-            var data = JSON.parse(event.data)
-            dynamicDraw(data);
-            updateInfoDiv(data);
-        });
-
-        sse.onopen = function (event) {
-            needInitialZoom = true;
-            console.log("Connected");
-        };
-
-        sse.onmessage = function (event) {
-            console.log(event.lastEventId)
-            console.log(event.data);
-        };
-
-        sse.onerror = e => {
-            if (e.readyState == EventSource.CLOSED) {
-                console.log('close');
-            }
-            else {
-                console.log(e);
-            }
-        };
-
-    }
+        else {
+            console.log(e);
+        }
+    };
 }

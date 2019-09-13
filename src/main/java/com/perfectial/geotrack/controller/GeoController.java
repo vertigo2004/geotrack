@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,15 +25,6 @@ public class GeoController {
 
     @Autowired
     GpxParser gpxParser;
-
-
-    @Value("${service.url}")
-    private String serviceHost;
-
-    @ModelAttribute
-    public void addServiceHost(Model model) {
-        model.addAttribute("service", serviceHost);
-    }
 
     @GetMapping("/gpx")
     public String showMap(Model model)  throws IOException {

@@ -19,14 +19,6 @@
         <service.url>http://localhost:8080</service.url>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>aws</id>
-            <properties>
-                <service.url>http://ec2-34-209-191-182.us-west-2.compute.amazonaws.com:8080</service.url>
-            </properties>
-        </profile>
-    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.paho</groupId>
@@ -83,6 +75,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/broker.properties</exclude>
+                </excludes>
             </resource>
         </resources>
 
